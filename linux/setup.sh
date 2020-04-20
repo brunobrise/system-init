@@ -1,6 +1,6 @@
 #! /bin/bash -x
 
-BINDIR='/usr/local/bin'
+LOCALBINDIR='/usr/local/bin'
 
 install_shell() {
     echo -e '\e[0;33mSetting up zsh as the shell\e[0m'
@@ -39,16 +39,16 @@ eval "$(direnv hook bash)"' | tee -a ~/.bashrc
 eval "$(direnv hook zsh)"' | tee -a ~/.zshrc
 
     ## z
-    sudo wget https://raw.githubusercontent.com/rupa/z/master/z.sh --output-document "${BINDIR}/z" &&
-        sudo chmod +x ${BINDIR}/z
+    sudo wget https://raw.githubusercontent.com/rupa/z/master/z.sh --output-document "${LOCALBINDIR}/z" &&
+        sudo chmod +x ${LOCALBINDIR}/z
 
     ## fzf
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     ~/.fzf/install --all
 
     ## bat install on ubuntu <19.10
-    wget https://github.com/sharkdp/bat/releases/download/v0.13.0/bat_0.13.0_amd64.deb --output-document "$tmpDir/bat_0.13.0_amd64.deb" &&
-        sudo dpkg -i "$tmpDir/bat_0.13.0_amd64.deb"
+    wget https://github.com/sharkdp/bat/releases/download/v0.13.0/bat_0.13.0_amd64.deb --output-document "${tmpDir}/bat_0.13.0_amd64.deb" &&
+        sudo dpkg -i "${tmpDir}/bat_0.13.0_amd64.deb"
     # apt install bat
 }
 
@@ -65,8 +65,8 @@ install_devtools() {
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
         gover=1.14.2
-        wget "https://storage.googleapis.com/golang/go$gover.linux-amd64.tar.gz" --output-document "$tmpDir/go.tar.gz"
-        sudo tar -C /usr/local -xzf "$tmpDir/go.tar.gz"
+        wget "https://storage.googleapis.com/golang/go${gover}.linux-amd64.tar.gz" --output-document "${tmpDir}/go.tar.gz"
+        sudo tar -C /usr/local -xzf "${tmpDir}/go.tar.gz"
     fi
 
     ## Node.js via fnm
@@ -77,16 +77,20 @@ export PATH=~/.fnm:$PATH
 eval "`fnm env --multi`"' >> ~/.zshrc
 
     ## hey
-    sudo wget https://storage.googleapis.com/hey-release/hey_linux_amd64 -O ${BINDIR}/hey &&
-        sudo chmod +x ${BINDIR}/hey
+    sudo wget https://storage.googleapis.com/hey-release/hey_linux_amd64 -O ${LOCALBINDIR}/hey &&
+        sudo chmod +x ${LOCALBINDIR}/hey
 }
 
 echo -e '\e[0;33mPreparing to setup a linux machine from a base install\e[0m'
 
 tmpDir=~/tmp/setup-base
+if [ ! -d "${tmpDir}" ]; then
+    mkdir --parents ${tmpDir}
+fi
 
-if [ ! -d "$tmpDir" ]; then
-    mkdir --parents $tmpDir
+binDir=~/bin
+if [ ! -d "${binDir}" ]; then
+    mkdir --parents ${binDir}
 fi
 
 ## General updates
@@ -104,4 +108,4 @@ install_shell
 install_utilities
 install_devtools
 
-rm -rf $tmpDir
+rm -rf ${tmpDir}
