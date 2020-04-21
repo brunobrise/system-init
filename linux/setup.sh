@@ -81,6 +81,17 @@ eval "`fnm env --multi`"' >> ~/.zshrc
         sudo chmod +x ${LOCALBINDIR}/hey
 }
 
+install_devopstools() {
+    echo -e '\e[0;33mInstalling devops software\e[0m'
+
+    ## terraform
+    terraformver=$(curl -s https://github.com/hashicorp/terraform/releases/latest | awk -F"\"" '{print $2}' | awk -F/ '{print $NF}')
+    terraformver=${terraformver:1} # remove 'v' char
+    wget "https://releases.hashicorp.com/terraform/${terraformver}/terraform_${terraformver}_linux_amd64.zip"  --output-document "${tmpDir}/terraform_linux_amd64.zip" &&
+        unzip -qo "${tmpDir}/terraform_linux_amd64.zip" -d "${tmpDir}" &&
+        sudo mv "${tmpDir}/terraform" "${LOCALBINDIR}/"
+}
+
 echo -e '\e[0;33mPreparing to setup a linux machine from a base install\e[0m'
 
 tmpDir=~/tmp/setup-base
@@ -107,5 +118,6 @@ mkdir -p ~/code/github
 install_shell
 install_utilities
 install_devtools
+install_devopstools
 
 rm -rf ${tmpDir}
